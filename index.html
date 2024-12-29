@@ -20,7 +20,7 @@
     <meta property="og:title" content="Let it snow" />
     <meta property="og:description" content="Make your own snowflake!" />
     <meta property="og:image" content="snow_og.jpg" />
-    <script src="https://aframe.io/releases/0.2.0/aframe.min.js"></script>
+    <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
 </head>
 
@@ -82,7 +82,7 @@
             </svg>
         </div>
     </div>
-    <a-scene vr-mode-ui="enabled: true" inspector="url: https://aframe.io/releases/0.3.0/aframe-inspector.min.js" fog="type: linear; color: #222;near:1;far:100">
+    <a-scene vr-mode-ui="enabled: true" inspector="url: https://aframe.io/releases/1.2.0/aframe-inspector.min.js" fog="type: linear; color: #222;near:1;far:100">
         <a-assets>
             <a-asset-item id="snowflake" src="plate_mirror.obj"></a-asset-item>
             <img src="flake2.png" id="the_tile">
@@ -91,8 +91,8 @@
         <a-light type="ambient" color="#444"></a-light>
         <a-light type="point" color="#eee" position="0 0 0"></a-light>
         <a-entity class="container" position="0 0 0" rotation="0 0 0">
-            <a-entity static-body class="sample" obj-model="obj: #snowflake;" scale=".2 .2 .2" position="0 0.3 -5" rotation="45 0 0" material="color:white;transparent:true;side:double">
-                <a-animation easing="linear" attribute="rotation" dur="10000" fill="forwards" to="45 360 0" repeat="indefinite"></a-animation>
+            <a-entity static-body class="sample" obj-model="obj: #snowflake;" scale=".2 .2 .2" position="0 0.3 -5" rotation="45 0 0" material="color:white;transparent:true;side:double"
+                animation="property: rotation; to: 45 360 0; dur: 10000; easing: linear; loop: true">
             </a-entity>
             <a-entity id="myCam" camera position="0 0 0" rotation="0 0 0">
             </a-entity>
@@ -117,7 +117,7 @@ function make_one() {
     var ini_x = (Math.random() * 100 - 50);
     var ini_y = (Math.random() * 100 + 100);
     var ini_z = (Math.random() * 100 - 50);
-    var t_txt = '<a-entity class="snow" position="' + ini_x + ' ' + ini_y + ' ' + ini_z + '" rotation="0 0 0" obj-model="obj: #snowflake;" scale=".2 .2 .2" material="side:double;transparent:true;src:#the_tile"><a-animation attribute="position" easing="linear" dur="' + (Math.random() * 20000 + 15000) + '" fill="forwards" to="' + ini_x + ' ' + (Math.random() * 40 - 200) + ' ' + ini_z + '"></a-animation><a-animation attribute="rotation" easing="linear" dur="' + (Math.random() * 20000 + 15000) + '" fill="forwards" to="' + (Math.random() * 30) + ' ' + (Math.random() * 360) + ' 0"></a-animation></a-entity>'
+    var t_txt = '<a-entity class="snow" position="' + ini_x + ' ' + ini_y + ' ' + ini_z + '" rotation="0 0 0" obj-model="obj: #snowflake;" scale=".2 .2 .2" material="side:double;transparent:true;src:#the_tile" animation__position="property: position; to: ' + ini_x + ' ' + (Math.random() * 40 - 200) + ' ' + ini_z + '; dur: ' + (Math.random() * 20000 + 15000) + '; easing: linear; loop: false" animation__rotation="property: rotation; to: ' + (Math.random() * 30) + ' ' + (Math.random() * 360) + ' 0; dur: ' + (Math.random() * 20000 + 15000) + '; easing: linear; loop: false"></a-entity>';
     $(t_txt).appendTo($('a-scene'))
 }
 
@@ -140,7 +140,7 @@ $('.start').on('click', function() {
         clearInterval(the_rand)
         $('a-entity.snow').remove()
         $('body').removeClass('snowing')
-        var t_txt = '<a-entity class="sample" obj-model="obj: #snowflake;" scale=".2 .2 .2" position="0 0.3 -5" rotation="45 0 0" material="src:#the_tile;transparent:true;side:double"><a-animation easing="linear" attribute="rotation" dur="10000" fill="forwards" to="45 360 0" repeat="indefinite"></a-animation></a-entity>'
+        var t_txt = '<a-entity class="sample" obj-model="obj: #snowflake;" scale=".2 .2 .2" position="0 0.3 -5" rotation="45 0 0" material="src:#the_tile;transparent:true;side:double" animation="property: rotation; to: 45 360 0; dur: 10000; easing: linear; loop: true"></a-entity>';
         $(t_txt).appendTo($('.container'))
         $('#myCam').removeAttr('look-controls')
         $('#myCam').attr('rotation', '0 0 0')
@@ -216,7 +216,7 @@ function apply_img() {
     var dataUrl = t.toDataURL();
     $('a-assets > img').attr('src', dataUrl)
     $('.sample').remove();
-    var t_txt = '<a-entity class="sample" obj-model="obj: #snowflake;" scale=".2 .2 .2" position="0 0.3 -5" rotation="45 0 0" material="src:#the_tile;transparent:true;side:double"><a-animation easing="linear" attribute="rotation" dur="10000" fill="forwards" to="45 360 0" repeat="indefinite"></a-animation></a-entity>'
+    var t_txt = '<a-entity class="sample" obj-model="obj: #snowflake;" scale=".2 .2 .2" position="0 0.3 -5" rotation="45 0 0" material="src:#the_tile;transparent:true;side:double" animation="property: rotation; to: 45 360 0; dur: 10000; easing: linear; loop: true"></a-entity>';
     $(t_txt).appendTo($('.container'))
 }
 
