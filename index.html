@@ -47,6 +47,24 @@
         <a-light type="ambient" color="#444"></a-light>
         <a-light type="point" color="#eee" position="0 0 0"></a-light>
 
+        <!-- blinking/pulsing light source -->
+        <a-entity position="-3 1.6 +3">
+            <a-box   color="red" depth="0.05" height="0.05" width="0.05" material="emissive: #f00; emissiveIntensity: 2" animation="property: material.emissive; to: #200; dur: 1000; dir: alternate; loop: true"></a-box>
+            <a-light color="red" type="point" intensity="1" position="0 0 0"                                             animation="property: intensity; to: 0;            dur: 1000; dir: alternate; loop: true"></a-light>
+        </a-entity>
+
+        <!-- blinking/pulsing light source -->
+        <a-entity position="0 1.6 +3">
+            <a-box   color="green" depth="0.05" height="0.05" width="0.05" material="emissive: #0f0; emissiveIntensity: 2" animation="property: material.emissive; to: #020; dur: 2000; dir: alternate; loop: true"></a-box>
+            <a-light color="green" type="point" intensity="1" position="0 0 0"                                             animation="property: intensity; to: 0;            dur: 2000; dir: alternate; loop: true"></a-light>
+        </a-entity>
+
+        <!-- blinking/pulsing light source -->
+        <a-entity position="+3 1.6 +3">
+            <a-box   color="blue" depth="0.05" height="0.05" width="0.05" material="emissive: #00f; emissiveIntensity: 2" animation="property: material.emissive; to: #002; dur: 3000; dir: alternate; loop: true"></a-box>
+            <a-light color="blue" type="point" intensity="1" position="0 0 0"                                             animation="property: intensity; to: 0;            dur: 3000; dir: alternate; loop: true"></a-light>
+        </a-entity>
+
         <a-entity class="container" position="0 0 0" rotation="0 0 0">
 
             <a-entity static-body class="previewSnowflake" obj-model="obj: #snowflake;" scale=".2 .2 .2" position="0 0.3 -5" rotation="45 0 0" material="src:#snowflakeTexture;color:white;transparent:true;side:double"
