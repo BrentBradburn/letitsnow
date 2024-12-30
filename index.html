@@ -31,7 +31,10 @@
         </div>
     </div>
 
-    <a-scene vr-mode-ui="enabled: true" fog="type: linear; color: #222;near:1;far:100">
+    <a-scene
+        xr-mode-ui="enabled: true; XRMode: xr;"
+        fog="type: linear; color: #000;near:1;far:100"
+    >
 
         <a-assets>
             <a-asset-item id="snowflake" src="plate_mirror.obj"></a-asset-item>
@@ -40,7 +43,7 @@
             <img id="rightEyeTexture" src="right-eye-texture.png">
         </a-assets>
 
-        <a-sky color="#000"></a-sky>
+        <!--<a-sky color="#000"></a-sky>-->
         <a-light type="ambient" color="#444"></a-light>
         <a-light type="point" color="#eee" position="0 0 0"></a-light>
 
