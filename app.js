@@ -4,8 +4,6 @@ var t;
 var d;
 var ttx;
 var dtx;
-var st_x;
-var st_y;
 var pre_x;
 var pre_y;
 var the_rand;
@@ -32,6 +30,14 @@ function snow() {
     }, 300)
 }
 
+function apply_img() {
+    var dataUrl = t.toDataURL();
+    $('a-assets > img').attr('src', dataUrl)
+    $('.sample').remove();
+    var t_txt = '<a-entity class="sample" obj-model="obj: #snowflake;" scale=".2 .2 .2" position="0 0.3 -5" rotation="45 0 0" material="src:#the_tile;transparent:true;side:double" animation="property: rotation; to: 45 360 0; dur: 10000; easing: linear; loop: true"></a-entity>';
+    $(t_txt).appendTo($('.container'))
+}
+
 $('.start').on('click', function() {
     if ($('body').hasClass('snowing')) {
         clearInterval(the_rand)
@@ -52,59 +58,36 @@ $('.start').on('click', function() {
     }
 })
 
-var is_drawing = 0;
+// handle interactive drawing of cutlines
+{
+let cutlines = 0;
+let first_x, first_y;
+function isMouseOverFirstPoint(e) { return Math.sqrt( (e.pageX-first_x)*(e.pageX-first_x) + (e.pageY-first_y)*(e.pageY-first_y)) < 15 } // distance between cursor and 'first' point is close enough to consider it a click
+$('.wrapper').on('mousemove', function(e) { if ( isMouseOverFirstPoint(e) ) { $('.first').addClass('on') } else { $('.first').removeClass('on') } }) // embiggen the 'first' point indicator when mouse is close to it (suggesting that the user can click to close the path)
 $('.wrapper').on('click', function(e) {
-    var t_x = e.pageX - $('#theCanvas').offset().left;
-    var t_y = e.pageY - $('#theCanvas').offset().top;
-    var o_x = e.pageX - $(this).offset().left
-    var o_y = e.pageY - $(this).offset().top
-
-    if (is_drawing == 0) {
-        st_x = e.pageX
-        st_y = e.pageY
-        ttx.globalCompositeOperation = 'destination-out'
-        dtx.globalCompositeOperation = 'source-over'
-        ttx.beginPath();
-        dtx.beginPath();
-        ttx.moveTo(t_x, t_y);
-        dtx.moveTo(o_x, o_y);
-        is_drawing = 1
-        $('<div class="first dot" style="left:' + o_x + 'px;top:' + o_y + 'px;"></div>').appendTo($(this))
-    } else if (is_drawing > 0) {
-        var dist = Math.sqrt((e.pageX - st_x) * (e.pageX - st_x) + (e.pageY - st_y) * (e.pageY - st_y))
-        if (dist < 15) {
-            ttx.closePath();
-            ttx.fill();
-            dtx.closePath();
-            dtx.clearRect(0, 0, $('#dotCanvas').width(), $('#dotCanvas').height());
-            is_drawing = 0;
+    var [t_x, t_y] = [e.pageX - $('#theCanvas').offset().left, e.pageY - $('#theCanvas').offset().top];
+    var [o_x, o_y] = [e.pageX - $(this).offset().left, e.pageY - $(this).offset().top];
+    if (cutlines == 0) { // create the starting point 'first'
+        [first_x, first_y] = [e.pageX, e.pageY];
+        ttx.globalCompositeOperation = 'destination-out', ttx.beginPath(), ttx.moveTo(t_x, t_y);
+        dtx.globalCompositeOperation = 'source-over', dtx.beginPath(), dtx.moveTo(o_x, o_y);
+        cutlines = 1
+        $('<div class="first dot" style="left:' + o_x + 'px;top:' + o_y + 'px;"></div>').appendTo($(this)) // draw the 'first' point indicator
+    } else if (cutlines > 0) {
+        if ( isMouseOverFirstPoint(e) ) { // the first point has been clicked -- close the path and make the cuts
+            ttx.closePath(), ttx.fill();
+            dtx.closePath(), dtx.clearRect(0, 0, $('#dotCanvas').width(), $('#dotCanvas').height());
+            cutlines = 0; // reset the cutlines tracker
             $('.dot').remove()
             apply_img()
-        } else {
+        } else { // add the next cutline
             ttx.lineTo(t_x, t_y);
-            dtx.lineTo(o_x, o_y);
-            dtx.stroke();
-            is_drawing++
-            $('<div class="dot" style="left:' + o_x + 'px;top:' + o_y + 'px;"></div>').appendTo($(this))
+            dtx.lineTo(o_x, o_y), dtx.stroke();
+            cutlines++
+            $('<div class="dot" style="left:' + o_x + 'px;top:' + o_y + 'px;"></div>').appendTo($(this)) // draw the new cutline point indicator
         }
-
     }
 })
-$('.wrapper').on('mousemove', function(e) {
-    var dist = Math.sqrt((e.pageX - st_x) * (e.pageX - st_x) + (e.pageY - st_y) * (e.pageY - st_y))
-    if (dist < 15) {
-        $('.first').addClass('on')
-    } else {
-        $('.first').removeClass('on')
-    }
-})
-
-function apply_img() {
-    var dataUrl = t.toDataURL();
-    $('a-assets > img').attr('src', dataUrl)
-    $('.sample').remove();
-    var t_txt = '<a-entity class="sample" obj-model="obj: #snowflake;" scale=".2 .2 .2" position="0 0.3 -5" rotation="45 0 0" material="src:#the_tile;transparent:true;side:double" animation="property: rotation; to: 45 360 0; dur: 10000; easing: linear; loop: true"></a-entity>';
-    $(t_txt).appendTo($('.container'))
 }
 
 $('.preview').on('click', function() {
