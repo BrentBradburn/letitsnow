@@ -34,7 +34,7 @@
 
         <a-assets>
             <a-asset-item id="snowflake" src="plate_mirror.obj"></a-asset-item>
-            <img id="snowflakeTexture" src="">
+            <img id="snowflakeTexture" src="icon.png">
         </a-assets>
 
         <a-sky color="#000"></a-sky>
@@ -43,7 +43,7 @@
 
         <a-entity class="container" position="0 0 0" rotation="0 0 0">
 
-            <a-entity static-body class="previewSnowflake" obj-model="obj: #snowflake;" scale=".2 .2 .2" position="0 0.3 -5" rotation="45 0 0" material="color:white;transparent:true;side:double"
+            <a-entity static-body class="previewSnowflake" obj-model="obj: #snowflake;" scale=".2 .2 .2" position="0 0.3 -5" rotation="45 0 0" material="src:#snowflakeTexture;color:white;transparent:true;side:double"
                 animation="property: rotation; to: 45 360 0; dur: 10000; easing: linear; loop: true">
             </a-entity>
 
