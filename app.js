@@ -2,20 +2,13 @@ $(document).ready(function() {
     
 var num_snow = 120;
 
-var t;
-var d;
-var ttx;
-var dtx;
-var pre_x;
-var pre_y;
+var t, ttx; // texture canvas and context
+var d, dtx; // dot/cutlines canvas and context
 var the_rand;
 
-function apply_img() {
-    var dataUrl = t.toDataURL();
-    $('a-assets > img').attr('src', dataUrl)
-    //$('.sample').remove();
-    var t_txt = '<a-entity class="sample" obj-model="obj: #snowflake;" scale=".2 .2 .2" position="0 0.3 -5" rotation="45 0 0" material="src:#the_tile;transparent:true;side:double" animation="property: rotation; to: 45 360 0; dur: 10000; easing: linear; loop: true"></a-entity>';
-    $('.container').append($(t_txt));
+function updateSnowflakeTexture() {
+    $('#snowflakeTexture').attr('src', t.toDataURL()) // update the texture <img> with the current canvas contents
+    $('.previewSnowflake').attr('material','src:').attr('material', 'src:#snowflakeTexture'); // remove and replace the material to force a reload of the texture
 }
 
 // handle interactive drawing of cutlines and preview toggle
@@ -39,7 +32,7 @@ $('.wrapper').on('click', function(e) {
             dtx.closePath(), dtx.clearRect(0, 0, $('#dotCanvas').width(), $('#dotCanvas').height());
             cutlines = 0; // reset the cutlines tracker
             $('.dot').remove()
-            apply_img()
+            updateSnowflakeTexture()
         } else { // add the next cutline
             ttx.lineTo(t_x, t_y);
             dtx.lineTo(o_x, o_y), dtx.stroke();
@@ -58,7 +51,10 @@ function make_one() {
     var ini_x = (Math.random() * 100 - 50);
     var ini_y = (Math.random() * 100 + 100);
     var ini_z = (Math.random() * 100 - 50);
-    var t_txt = '<a-entity class="snow" position="' + ini_x + ' ' + ini_y + ' ' + ini_z + '" rotation="0 0 0" obj-model="obj: #snowflake;" scale=".2 .2 .2" material="side:double;transparent:true;src:#the_tile" animation__position="property: position; to: ' + ini_x + ' ' + (Math.random() * 40 - 200) + ' ' + ini_z + '; dur: ' + (Math.random() * 20000 + 15000) + '; easing: linear; loop: false" animation__rotation="property: rotation; to: ' + (Math.random() * 30) + ' ' + (Math.random() * 360) + ' 0; dur: ' + (Math.random() * 20000 + 15000) + '; easing: linear; loop: false"></a-entity>';
+    var t_txt = '<a-entity class="snow" position="' + ini_x + ' ' + ini_y + ' ' + ini_z + '" rotation="0 0 0" obj-model="obj: #snowflake;" scale=".2 .2 .2" material="side:double;transparent:true;src:#snowflakeTexture"'
+              + ' animation__position="property: position; to: ' + ini_x + ' ' + (Math.random() * 40 - 200) + ' ' + ini_z + '; dur: ' + (Math.random() * 20000 + 15000) + '; easing: linear; loop: false"'
+              + ' animation__rotation="property: rotation; to: ' + (Math.random() * 30) + ' ' + (Math.random() * 360) + ' 0; dur: ' + (Math.random() * 20000 + 15000) + '; easing: linear; loop: false">'
+              + '</a-entity>';
     $('a-scene').append($(t_txt));
 }
 
@@ -77,41 +73,44 @@ function snow() {
 }
 
 $('.start').on('click', function() {
-    if ($('body').hasClass('snowing')) {
+    if ($('body').hasClass('snowing')) { // switch to crafting mode
         clearInterval(the_rand)
         $('a-entity.snow').remove()
         $('body').removeClass('snowing')
-        var t_txt = '<a-entity class="sample" obj-model="obj: #snowflake;" scale=".2 .2 .2" position="0 0.3 -5" rotation="45 0 0" material="src:#the_tile;transparent:true;side:double" animation="property: rotation; to: 45 360 0; dur: 10000; easing: linear; loop: true"></a-entity>';
-        $('.container').append($(t_txt));
+        $('.previewSnowflake').attr('visible','true')
         $('#myCam').removeAttr('look-controls')
         $('#myCam').attr('rotation', '0 0 0')
         scene = document.querySelector('a-scene');
         scene.exitVR();
-    } else {
+    } else { // switch to snowing mode
         $('body').addClass('snowing')
-        apply_img()
+        $('.previewSnowflake').attr('visible','false')
         snow()
-        $('.sample').remove();
         $('#myCam').attr('look-controls', '')
     }
 })
 
 function initialize() {
 
-    // scale the folded paper
-    let scale = 0.7 // percentage of the "wrapper" (div) height to use for the folded paper
+    // Note: The snowflake asset is not equivalent to a 2D dodecagon -- it's not possible to flatten it into a 2D shape.
+    // This may explain why the original code used an aspect of 17/31 instead of 4-2*sqrt(3) -- and the angle (in CSS) is slightly more than 15 degrees.
+    // Based on an assumption of exactly 15.0 degrees, my triangles wouldn't line up perfectly with the snowflake asset //!!bmb-whoops!
+
+    //let aspect = 17/31 // the original aspect ratio -- not sure if it's correct given the 3D shape of the snowflake asset
     let aspect = 4-2*Math.sqrt(3) // the aspect ratio of the folded paper (based on 12 identical equilateral triangles that unfold to form a dodecagon)
+    let scale = 0.7 // percentage of the screen height to display the folded paper (roughly) //!!bmb-there's some broken interaction with the 'cover' divs when this is close to 1
+
     let [wx, wy] = [$('.wrapper').width(), $('.wrapper').height()]
-    //let [wx, wy] = [window.innerWidth, window.innerHeight];
+    //let [wx, wy] = [window.innerWidth, window.innerHeight]; // use the window size instead of the wrapper size (why not?)
     $('#theCanvas')[0].width = wy *2 * scale * aspect
     $('#theCanvas')[0].height = wy *2 * scale 
 
-    $('#dotCanvas').attr('width',  $('.wrapper').width() *2 );
-    $('#dotCanvas').attr('height', $('.wrapper').height()*2 );
+    $('#dotCanvas').attr('width',  wx*2 );
+    $('#dotCanvas').attr('height', wy*2 );
 
-    // theCanvas
+    // initialize texture canvas 'theCanvas'
     t = document.getElementById("theCanvas");
-     [t.style.width,t.style.height] = [t.width / 2 + 'px',t.height / 2 + 'px']
+    [t.style.width,t.style.height] = [t.width / 2 + 'px',t.height / 2 + 'px']
     t.getContext('2d').scale(2, 2)
     ttx = t.getContext("2d");
     ttx.fillStyle = "rgba(255,255,255,1)";
@@ -123,7 +122,7 @@ function initialize() {
     $('.cover.right').css('left', (($('.wrapper').width() - $('#theCanvas').width()) / 2 + $('#theCanvas').width()) + 'px')
     $('.cover.left').css('right', (($('.wrapper').width() - $('#theCanvas').width()) / 2 + $('#theCanvas').width()) + 'px')
 
-    // dotCanvas
+    // initialize dot/cutlines canvas 'dotCanvas'
     d = document.getElementById("dotCanvas");
     d.style.width = d.width / 2 + 'px'
     d.style.height = d.height / 2 + 'px'
@@ -137,7 +136,5 @@ function initialize() {
 }
 
 $(window).on('load resize', function() { initialize() })
-
-//initialize()
 
 });
