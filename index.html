@@ -61,10 +61,9 @@
                 <a-plane class="rightEyePlane" position="0 0 0" material="src: #rightEyeTexture" stereo="eye: right"></a-plane>
             </a-entity>
 
-            <!-- panel with stereoscopic texture (different textures for each eye) -->
-            <a-entity id="mirrorPanel" position="+0 1.1 -1.4" rotation="0 0 0">
-                <a-plane class="leftEyePlane" position="0 0 0" material="src: #leftEyeTexture" stereo="eye: left"></a-plane>
-                <a-plane class="rightEyePlane" position="0 0 0" material="src: #rightEyeTexture" stereo="eye: right"></a-plane>
+            <!-- panel with a (limited) mirror effect -->
+            <a-entity id="mirrorPanel" position="0 1.1 -1.4" rotation="0 0 0">
+                <a-plane class="mirror" position="0 0 0" width="1" height="1" material="envMap: #sky; metalness: 1; roughness: 0"></a-plane>
             </a-entity>
 
         </a-entity>
@@ -107,7 +106,7 @@
     }
 
     generatePanelFrame("displayPanel",892,964,14)
-    generatePanelFrame("mirrorPanel",1,2,60)
+    //generatePanelFrame("mirrorPanel",1,2,60)
     </script>
 
     <script src="app.js"></script>
