@@ -136,5 +136,6 @@ function initialize() {
 }
 
 $(window).on('load resize', function() { initialize() })
+$('.start').click() // select the initial viewing mode (optional)
 
 });
