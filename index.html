@@ -50,21 +50,55 @@
                 animation="property: rotation; to: 45 360 0; dur: 10000; easing: linear; loop: true">
             </a-entity>
 
-            <a-camera id="myCam" position="0 0 0" rotation="0 0 0"></a-camera>
+            <a-camera id="myCam" position="0 1.0 0" rotation="0 0 0"></a-camera>
 
             <!-- panel with stereoscopic texture (different textures for each eye) -->
-            <a-entity position="-0.75 1.1 -0.4" rotation="0 55 0" scale="0.0004 0.0004">
-                <a-plane position="0 0 0" width="892" height="964" material="src: #leftEyeTexture" stereo="eye: left"></a-plane>
-                <a-plane position="0 0 0" width="892" height="964" material="src: #rightEyeTexture" stereo="eye: right"></a-plane>
+            <a-entity id="displayPanel" position="-0.75 1.1 -0.4" rotation="0 55 0">
+                <a-plane id="leftEyePlane" position="0 0 0" material="src: #leftEyeTexture" stereo="eye: left"></a-plane>
+                <a-plane id="rightEyePlane" position="0 0 0" material="src: #rightEyeTexture" stereo="eye: right"></a-plane>
             </a-entity>
-
-            <!-- FYI: All kinds of objects can be rendered separately per eye -->
-            <a-sphere position="0 1.5 5" radius="1" color="#FF0000" stereo="eye: left"></a-sphere>
-            <a-sphere position="0 1.5 5" radius="1" color="#00FF00" stereo="eye: left"></a-sphere>
 
         </a-entity>
 
     </a-scene>
+
+    <script>
+    function generateDisplayPanelFrame(panelId,xaspect,yaspect,size) {
+
+        const [bezelThickness,bezelDepth,panelDepth] = [0.02,0.005,0.02] // tuning parameters (in meters)
+
+        const metersPerInch = 0.0254
+        const scale = (size*metersPerInch)/Math.sqrt(xaspect*xaspect+yaspect*yaspect)
+        const [panelWidth, panelHeight] = [xaspect*scale, yaspect*scale]
+        const backCoverThickness = Math.min(bezelDepth,(panelDepth-bezelDepth)/2) // kind of arbitrary (but should be less than panelDepth-bezelDepth so that it doesn't overlap the display)
+
+        // apply the computed dimensions to the panel's view planes
+        const [leftEyePlane, rightEyePlane] = [document.getElementById('leftEyePlane'), document.getElementById('rightEyePlane')]
+        ;[leftEyePlane, rightEyePlane].forEach(plane => { plane.setAttribute('width', panelWidth); plane.setAttribute('height', panelHeight); })
+
+        // define bezel elements
+        const displayPanel = document.getElementById(panelId)
+        const [bezelX,bezelY,bezelZ] = [panelWidth/2+bezelThickness/2,panelHeight/2+bezelThickness/2,-(panelDepth/2-bezelDepth)]
+        const bezels = [
+            { position: `0 ${+bezelY} ${bezelZ}`, width: panelWidth + 2*bezelThickness, height: bezelThickness }, // Top
+            { position: `0 ${-bezelY} ${bezelZ}`, width: panelWidth + 2*bezelThickness, height: bezelThickness }, // Bottom
+            { position: `${-bezelX} 0 ${bezelZ}`, width: bezelThickness, height: panelHeight }, // Left
+            { position: `${+bezelX} 0 ${bezelZ}`, width: bezelThickness, height: panelHeight } // Right
+        ]
+
+        bezels.forEach(bezel => {
+            const bezelElement = document.createElement('a-box')
+            Object.entries({position: bezel.position, width: bezel.width, height: bezel.height, depth: panelDepth, color: 'black' }).forEach(([key, value]) => bezelElement.setAttribute(key, value))
+            displayPanel.appendChild(bezelElement)
+        })
+
+        const backCover = document.createElement('a-box')
+        Object.entries({ position: `0 0 ${-(panelDepth - bezelDepth - backCoverThickness / 2)}`, width: panelWidth, height: panelHeight, depth: backCoverThickness, color: 'green' }).forEach(([key, value]) => backCover.setAttribute(key, value))
+        displayPanel.appendChild(backCover)
+    }
+
+    generateDisplayPanelFrame("displayPanel",892,964,14)
+    </script>
 
     <script src="app.js"></script>
 
