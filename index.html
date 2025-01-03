@@ -74,14 +74,14 @@
             <a-camera id="myCam" position="0 1.0 0" rotation="0 0 0" stereocam="eye:right"></a-camera>
 
             <!-- panel with stereoscopic texture (different textures for each eye) -->
-            <a-entity id="displayPanel" position="-0.75 1.1 -0.4" rotation="0 55 0">
-                <a-plane class="leftEyePlane" position="0 0 0" material="src: #leftEyeTexture" stereo="eye: left"></a-plane>
-                <a-plane class="rightEyePlane" position="0 0 0" material="src: #rightEyeTexture" stereo="eye: right"></a-plane>
+            <a-entity id="stereoPanel1" position="-0.75 1.1 -0.4" rotation="0 55 0">
+                <a-plane material="src: #leftEyeTexture" stereo="eye: left"></a-plane>
+                <a-plane material="src: #rightEyeTexture" stereo="eye: right"></a-plane>
             </a-entity>
 
             <!-- panel with a (limited) mirror effect -->
-            <a-entity id="mirrorPanel" position="0 1.1 -1.4" rotation="0 0 0">
-                <a-plane class="mirror" position="0 0 0" width="1" height="1" material="envMap: #sky; metalness: 1; roughness: 0"></a-plane>
+            <a-entity id="mirrorPanel1" position="0 1.1 -1.4" rotation="0 0 0">
+                <a-plane material="envMap: #sky; metalness: 1; roughness: 0"></a-plane>
             </a-entity>
 
         </a-entity>
@@ -100,8 +100,8 @@
 
         // apply the computed dimensions to the panel's view planes
         const panel = document.getElementById(panelId);
-        const [leftEyePlane, rightEyePlane] = [panel.querySelector('.leftEyePlane'),panel.querySelector('.rightEyePlane')]
-        ;[leftEyePlane, rightEyePlane].forEach(plane => { plane.setAttribute('width', panelWidth); plane.setAttribute('height', panelHeight); })
+        const planes = panel.querySelectorAll('a-plane');
+        planes.forEach(plane => { plane.setAttribute('width', panelWidth); plane.setAttribute('height', panelHeight); })
 
         // define bezel elements
         const [bezelX,bezelY,bezelZ] = [panelWidth/2+bezelThickness/2,panelHeight/2+bezelThickness/2,-(panelDepth/2-bezelDepth)]
@@ -123,8 +123,8 @@
         panel.appendChild(backCover)
     }
 
-    generatePanelFrame("displayPanel",892,964,14)
-    //generatePanelFrame("mirrorPanel",1,2,60)
+    generatePanelFrame("stereoPanel1",892,964,14)
+    generatePanelFrame("mirrorPanel1",1,2,60)
     </script>
 
     <script src="app.js"></script>
