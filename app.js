@@ -1,6 +1,6 @@
 $(document).ready(function() {
     
-var num_snow = 120;
+var num_snow = 20;
 
 var t, ttx; // texture canvas and context
 var d, dtx; // dot/cutlines canvas and context

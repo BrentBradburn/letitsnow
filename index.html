@@ -9,6 +9,7 @@
     <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/oscarmarinmiro/aframe-stereo-component@master/dist/aframe-stereo-component.min.js"></script>
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="mirror-camera.js"></script>
 </head>
 
 <body>
@@ -79,10 +80,18 @@
                 <a-plane material="src: #rightEyeTexture" stereo="eye: right"></a-plane>
             </a-entity>
 
-            <!-- panel with a (limited) mirror effect -->
-            <a-entity id="mirrorPanel1" position="0 1.1 -1.4" rotation="0 0 0">
+            <!-- high gloss panel -->
+            <a-entity id="glossyPanel1" position="0 1.1 -1.4" rotation="0 0 0">
                 <a-plane material="envMap: #sky; metalness: 1; roughness: 0"></a-plane>
             </a-entity>
+
+            <!-- mirror panel -->
+            <a-entity id="mirrorPanel1" position="+1 1.1 0" rotation="0 270 0">
+                <a-plane></a-plane>
+            </a-entity>
+
+            <!-- Add mirror camera entity -->
+            <a-entity mirror-camera position="+1.5 1.1 0" rotation="0 270 0"></a-entity>
 
         </a-entity>
 
@@ -124,7 +133,8 @@
     }
 
     generatePanelFrame("stereoPanel1",892,964,14)
-    generatePanelFrame("mirrorPanel1",1,2,60)
+    generatePanelFrame("glossyPanel1",1,2,60)
+    generatePanelFrame("mirrorPanel1",2,2,90)
     </script>
 
     <script src="app.js"></script>
