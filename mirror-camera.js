@@ -15,18 +15,25 @@ AFRAME.registerComponent('mirror-camera', {
       }
     );
 
-    // Create mirror camera
+    // Create mirror camera with flipped scale
     this.mirrorCamera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+    this.mirrorCamera.scale.x = -1; // Flip horizontally
     this.el.object3D.add(this.mirrorCamera);
 
+/*
     // Create material using render target
     this.mirrorMaterial = new THREE.MeshBasicMaterial({
-   //   map: this.renderTarget.texture
+      map: this.renderTarget.texture,
+      side: THREE.FrontSide
     });
+*/
 
     // Find mirror panel and update its material
     const mirrorPanel = document.querySelector('#mirrorPanel1 a-plane');
-    mirrorPanel.setAttribute('material', {src: this.renderTarget.texture});
+    mirrorPanel.setAttribute('material', {
+      src: this.renderTarget.texture //,
+     // side: 'front'
+    });
   },
 
   tick: function() {
