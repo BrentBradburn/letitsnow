@@ -39,8 +39,11 @@ AFRAME.registerComponent('mirror-camera', {
 
     // Render to texture
     const currentRenderTarget = renderer.getRenderTarget();
+    const currentXREnabled = renderer.xr.enabled;
     renderer.setRenderTarget(this.renderTarget);
+    renderer.xr.enabled = false;
     renderer.render(scene, this.mirrorCamera);
+    renderer.xr.enabled = currentXREnabled;
     renderer.setRenderTarget(currentRenderTarget);
   }
 });
