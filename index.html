@@ -134,40 +134,66 @@
 
     <script>
     AFRAME.registerComponent('offscreen-render', {
-        init: function() {
-            // Create offscreen scene
-            this.scene = new THREE.Scene();
-            this.camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
-            this.camera.position.z = 5;
 
-            // Create render target
-            this.renderTarget = new THREE.WebGLRenderTarget(512, 512);
+        init: function() {
+            console.log('Initializing offscreen-render component');
+
+            // Create canvas
+            this.canvas = document.createElement('canvas');
+            this.canvas.width = 512;
+            this.canvas.height = 512;
+
+            // Setup renderer
+            this.offscreenRenderer = new THREE.WebGLRenderer({
+                canvas: this.canvas,
+                antialias: true
+            });
+            this.offscreenRenderer.setSize(512, 512);
+            this.offscreenRenderer.setClearColor(0xff0000); // Red for debug
+
+            // Setup scene
+            this.scene = new THREE.Scene();
+            
+            // Setup camera
+            this.camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+            this.camera.position.z = 3;
 
             // Create test content
             const geometry = new THREE.BoxGeometry();
-            const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+            const material = new THREE.MeshNormalMaterial();
             this.cube = new THREE.Mesh(geometry, material);
             this.scene.add(this.cube);
 
-            // Apply texture to plane
+            // Setup plane material with canvas texture
+            const texture = new THREE.CanvasTexture(this.canvas);
+            texture.needsUpdate = true;
+            
             const planeMesh = this.el.getObject3D('mesh');
             planeMesh.material = new THREE.MeshBasicMaterial({
-                map: this.renderTarget.texture
+                map: texture,
+                side: THREE.DoubleSide
             });
+            
+            this.texture = texture;
         },
 
+        // Animate and render
         tick: function(time) {
-            // Animate test content
+
             this.cube.rotation.x = time * 0.001;
             this.cube.rotation.y = time * 0.001;
+            
+            this.offscreenRenderer.render(this.scene, this.camera);
+            this.texture.needsUpdate = true;
 
-            // Render to texture
-            const renderer = this.el.sceneEl.renderer;
-            const currentTarget = renderer.getRenderTarget();
-            renderer.setRenderTarget(this.renderTarget);
-            renderer.render(this.scene, this.camera);
-            renderer.setRenderTarget(currentTarget);
+        },
+
+        remove: function() {
+            console.log('Removing offscreen-render component');
+            this.offscreenRenderer.dispose();
+            this.texture.dispose();
         }
+
     });
     </script>
 
