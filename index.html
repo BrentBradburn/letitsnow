@@ -84,6 +84,10 @@
                 <a-plane material="envMap: #sky; metalness: 1; roughness: 0"></a-plane>
             </a-entity>
 
+            <a-entity id="offscreenRenderTarget" position="1.25 1.1 0" rotation="0 -90 0">
+                <a-plane offscreen-render></a-plane>
+            </a-entity>
+
         </a-entity>
 
     </a-scene>
@@ -125,6 +129,46 @@
 
     generatePanelFrame("stereoPanel1",892,964,14)
     generatePanelFrame("mirrorPanel1",1,2,60)
+    generatePanelFrame("offscreenRenderTarget",1,1,60)
+    </script>
+
+    <script>
+    AFRAME.registerComponent('offscreen-render', {
+        init: function() {
+            // Create offscreen scene
+            this.scene = new THREE.Scene();
+            this.camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+            this.camera.position.z = 5;
+
+            // Create render target
+            this.renderTarget = new THREE.WebGLRenderTarget(512, 512);
+
+            // Create test content
+            const geometry = new THREE.BoxGeometry();
+            const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+            this.cube = new THREE.Mesh(geometry, material);
+            this.scene.add(this.cube);
+
+            // Apply texture to plane
+            const planeMesh = this.el.getObject3D('mesh');
+            planeMesh.material = new THREE.MeshBasicMaterial({
+                map: this.renderTarget.texture
+            });
+        },
+
+        tick: function(time) {
+            // Animate test content
+            this.cube.rotation.x = time * 0.001;
+            this.cube.rotation.y = time * 0.001;
+
+            // Render to texture
+            const renderer = this.el.sceneEl.renderer;
+            const currentTarget = renderer.getRenderTarget();
+            renderer.setRenderTarget(this.renderTarget);
+            renderer.render(this.scene, this.camera);
+            renderer.setRenderTarget(currentTarget);
+        }
+    });
     </script>
 
     <script src="app.js"></script>
