@@ -109,10 +109,24 @@ AFRAME.registerComponent('offscreen-render', {
         });
         
         this.texture = texture;
+
+        // Get reference to VR camera
+        this.vrCamera = document.querySelector('#myCam').object3D;
+        
+        // Setup matching camera 
+        this.camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
+        this.camera.position.set(0, 1.6, 0);  // Match VR height
     },
 
     // Animate and render
     tick: function(time) {
+
+        // Update camera position/rotation to match VR
+        if (this.vrCamera) {
+            this.camera.position.copy(this.vrCamera.position);
+            this.camera.rotation.copy(this.vrCamera.rotation);
+            this.camera.updateMatrix();
+        }
 
         this.cube.rotation.x = time * 0.001;
         this.cube.rotation.y = time * 0.001;
